@@ -1,4 +1,4 @@
 ﻿# JavaScript_30days
 Здесь будут роботы с тренинга  https://javascript30.com/
 
-all is ok
+7 leason is done
