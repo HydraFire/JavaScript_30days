@@ -55,10 +55,20 @@
 
     <script>
       const nav = document.querySelector('#main');
-      const topOfNav = nav.offsetTop;
-
+      var topOfNav = nav.offsetTop;
+      var heightWin = window.innerHeight;
 
       function fixNav(){
+        console.log(window.innerHeight)
+        console.log(window.scrollY,topOfNav)
+        
+        let heightWinResize = window.innerHeight;
+        
+        if(heightWin != heightWinResize){
+         topOfNav = nav.offsetTop;
+         heightWin = window.innerHeight;
+        }
+        
         if(window.scrollY >= topOfNav){
           document.body.style.paddingTop = nav.offsetHeight + 'px';
           document.body.classList.add('fixed-nav')
