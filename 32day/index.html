@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hold Shift to Check Multiple Checkboxes</title>
+    <style>
+      body {
+        background:
+          radial-gradient(black 15%, transparent 16%) 0 0,
+          radial-gradient(black 15%, transparent 16%) 8px 8px,
+          radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+          radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 8px 9px;
+        background-color:#282828;
+        background-size:16px 16px;
+        background-attachment: fixed;
+        font-family: 'helvetica neue';
+        font-weight: 200;
+        font-size: 20px;
+      }
+    </style> 
+  </head>
+  <body>
+
+
+    <script>
+      (function e(t,n,r){
+        function s(o,u){
+          if(!n[o]){
+            if(!t[o]){
+              var a=typeof require=="function" && require;
+              if(!u&&a)return a(o,!0);
+              if(i)return i(o,!0);
+              var f=new Error("Cannot find module '"+o+"'");
+              throw f.code="MODULE_NOT_FOUND",f
+            }
+            var l=n[o]={
+              exports:{}};t[o][0].call(l.exports,function(e){
+                var n=t[o][1][e];
+                return s(n?n:e)},l,l.exports,e,t,n,r)
+          }
+          return n[o].exports
+        }
+        var i=typeof require=="function"&&require;
+        for(var o=0;o<r.length;o++)s(r[o]);
+        return s
+      })
+      ({1:[function(require,module,exports){
+        const Analyser = require('web-audio-analyser')
+        const audio = document.createElement('audio');
+        var analyser = null;
+
+        audio.src = 'Buku.mp3' // src
+        audio.load()
+        canplay ()
+        function canplay () {
+          audio.play()
+          setTimeout(function () {
+            analyser = Analyser(audio)
+          },100)}
+
+        var frequencies
+        var waveform
+        setInterval(()=>{
+          if(analyser){
+            frequencies = analyser.frequencies();
+            waveform = analyser.waveform();
+            console.log(frequencies[0])
+          }
+        },50)
+
+      },{"./remember":3,"web-audio-analyser":2}],
+        2:[function(require,module,exports){
+          var AudioContext = window.AudioContext || window.webkitAudioContext
+
+          module.exports = WebAudioAnalyser
+
+          function WebAudioAnalyser(audio, ctx, opts) {
+            if (!(this instanceof WebAudioAnalyser)) return new WebAudioAnalyser(audio, ctx, opts)
+            if (!(ctx instanceof AudioContext)) (opts = ctx), (ctx = null)
+
+              opts = opts || {}
+              this.ctx = ctx = ctx || new AudioContext
+
+              if (!(audio instanceof AudioNode)) {
+                audio = (audio instanceof Audio || audio instanceof HTMLAudioElement)
+                  ? ctx.createMediaElementSource(audio)
+                : ctx.createMediaStreamSource(audio)
+              }
+
+            this.analyser = ctx.createAnalyser()
+            this.stereo   = !!opts.stereo
+            this.audible  = opts.audible !== false
+            this.wavedata = null
+            this.freqdata = null
+            this.splitter = null
+            this.merger   = null
+            this.source   = audio
+
+            if (!this.stereo) {
+              this.output = this.source
+              this.source.connect(this.analyser)
+              if (this.audible)
+                this.analyser.connect(ctx.destination)
+                } else {
+                  this.analyser = [this.analyser]
+                  this.analyser.push(ctx.createAnalyser())
+
+                  this.splitter = ctx.createChannelSplitter(2)
+                  this.merger   = ctx.createChannelMerger(2)
+                  this.output   = this.merger
+
+                  this.source.connect(this.splitter)
+
+                  for (var i = 0; i < 2; i++) {
+                    this.splitter.connect(this.analyser[i], i, 0)
+                    this.analyser[i].connect(this.merger, 0, i)
+                  }
+
+                  if (this.audible)
+                    this.merger.connect(ctx.destination)
+                    }
+          }
+
+          WebAudioAnalyser.prototype.waveform = function(output, channel) {
+            if (!output) output = this.wavedata || (
+              this.wavedata = new Uint8Array((this.analyser[0] || this.analyser).frequencyBinCount)
+            )
+
+            var analyser = this.stereo
+            ? this.analyser[channel || 0]
+            : this.analyser
+
+            analyser.getByteTimeDomainData(output)
+
+            return output
+          }
+
+          WebAudioAnalyser.prototype.frequencies = function(output, channel) {
+            if (!output) output = this.freqdata || (
+              this.freqdata = new Uint8Array((this.analyser[0] || this.analyser).frequencyBinCount)
+            )
+
+            var analyser = this.stereo
+            ? this.analyser[channel || 0]
+            : this.analyser
+
+            analyser.getByteFrequencyData(output)
+
+            return output
+          }
+
+        },{}],3:[function(require,module,exports){
+          module.exports = function (audio) {
+            const t = parseFloat(localStorage.getItem('remember:audioPosition')) || 0
+
+            audio.currentTime = t
+
+            setInterval(function () {
+              localStorage.setItem('remember:audioPosition', String(audio.currentTime))
+            }, 250)
+          }
+
+        },{}]},{},[1]);
+
+
+
+
+
+
+
+
+    </script>
+  </body>
+</html>
