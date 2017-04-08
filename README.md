@@ -1,4 +1,2 @@
-﻿# JavaScript_30days
-Здесь будут роботы с тренинга  https://javascript30.com/
-
-7 leason is done
+﻿"# JavaScript_30days" 
+![Preview](https://raw.githubusercontent.com/Nesmark/JavaScript_30days/master/WellDone.png)
